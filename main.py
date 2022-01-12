@@ -72,13 +72,7 @@ class Canvas:
     # render method
     def render(self) -> None:
         system("cls")
-
         print('\n'.join(''.join(row) for row in self.state))
-        self.update()
-
-        # recursively call render
-        sleep(0.1)
-        self.render()
 
 if __name__ == "__main__":
     # prompt for canvas self.size
@@ -87,4 +81,8 @@ if __name__ == "__main__":
     # initialize canvas
     canvas = Canvas(dimensions)
     canvas.seed_glider()
-    canvas.render()
+
+    while True:
+        canvas.render()
+        canvas.update()
+        sleep(0.1)
