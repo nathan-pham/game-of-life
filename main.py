@@ -121,18 +121,16 @@ class Canvas:
 
         return neighbors
 
-    def update(self) -> None:
+    def update(self, new_canvas: Canvas) -> None:
         """
         update the canvas each frame
+        
         SEQUENCING: 
             1. create a copy of the canvas to cache the previous state
             2. iterate through each cell
             3. calculate the living neighbors
             4. set the new state of the cell depending on the living neighbors
         """
-
-        # create a new canvas
-        new_canvas = self.copy()
 
         # ITERATION: loop through each cell 
         for y in range(self.size):
@@ -165,11 +163,12 @@ class Canvas:
 
     def animate(self, delay: int = 0.1) -> None:
         """
-        run update & render each frame
+        run update & render each frame with a specified delay
         """
 
         while True:
-            self.update()
+            # update the canvas with a copy of itself; using the canvas while it is being modified results in unexpected weirdness
+            self.update(new_canvas=self.copy())
             self.render()
             sleep(delay)
 
