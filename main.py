@@ -4,11 +4,14 @@ from typing import List
 from random import random
 from copy import deepcopy
 from time import sleep
-from os import system
+from sys import exit
+
+import os
 
 # how alive or dead cells should look
 ALIVE = "🟩"
 DEAD = "⬛"
+
 
 def input_int(message: str) -> int:
     """
@@ -19,6 +22,7 @@ def input_int(message: str) -> int:
     try:
         return int(input(message))
     except ValueError:
+        print("Enter a valid integer!")
         return input_int(message)
 
 
@@ -33,7 +37,12 @@ def input_str(message: str, enforce: List[str] = []) -> str:
     if response in enforce or len(enforce) == 0:
         return response
     else:
+        print(f"Enter a valid response! ({', '.join(enforce)})")
         return input_str(message, enforce)
+
+
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 # canvas class
@@ -51,7 +60,8 @@ class Canvas:
         if(from_state):
             self.state = deepcopy(from_state)
         else:
-            self.state = [[DEAD for j in range(self.size)] for i in range(self.size)]
+            self.state = [[DEAD for j in range(self.size)]
+                          for i in range(self.size)]
 
     def seed(self, initial_state: str) -> None:
         """
@@ -124,7 +134,7 @@ class Canvas:
     def update(self, new_canvas: Canvas) -> None:
         """
         update the canvas each frame
-        
+
         SEQUENCING: 
             1. create a copy of the canvas to cache the previous state
             2. iterate through each cell
@@ -132,7 +142,7 @@ class Canvas:
             4. set the new state of the cell depending on the living neighbors
         """
 
-        # ITERATION: loop through each cell 
+        # ITERATION: loop through each cell
         for y in range(self.size):
             for x in range(self.size):
 
@@ -158,7 +168,7 @@ class Canvas:
         render the canvas to the console each frame
         """
 
-        system("cls")
+        clear()
         print('\n'.join(''.join(row) for row in self.state))
 
     def animate(self, delay: int = 0.1) -> None:
@@ -170,6 +180,7 @@ class Canvas:
             # update the canvas with a copy of itself; using the canvas while it is being modified results in unexpected weirdness
             self.update(new_canvas=self.copy())
             self.render()
+            print("Press Ctrl+C to exit.")
             sleep(delay)
 
 
@@ -177,10 +188,11 @@ def main():
     """
     main method, called if this file is run directly
     """
-    
+
     # prompt for canvas self.size
-    dimensions = input_int("Enter the canvas width or height > ")
-    seed = input_str("Enter seed > ", ["glider", "random"])
+    print("Welcome to Conway's Game of Life!")
+    dimensions = input_int("Enter the canvas width and height > ")
+    seed = input_str("Enter seed (glider, random) > ", ["glider", "random"])
 
     # initialize canvas
     canvas = Canvas(dimensions)
@@ -191,4 +203,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nGoodbye!")
+        exit(0)
